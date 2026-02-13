@@ -31,6 +31,15 @@ All arguments are optional. Defaults: `key.pem`. If `cert.pem` is provided it be
 | DNS names | (none) | Enter one per line, blank to finish |
 | IP addresses | (none) | Enter one per line, blank to finish |
 
+### Extensions (v3_req)
+
+The generated config always includes:
+
+- `keyUsage = digitalSignature, keyEncipherment`
+- `extendedKeyUsage = serverAuth, clientAuth`
+- `basicConstraints = CA:TRUE/FALSE` (if specified)
+- `subjectAltName` (if DNS or IP entries provided)
+
 ### Output
 
 - **Config** — OpenSSL `.conf` file (CN.conf) saved for reuse with `openssl req` directly.
