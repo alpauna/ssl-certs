@@ -22,6 +22,7 @@ All arguments are optional. Defaults: `key.pem`. If `cert.pem` is provided it be
 | City (L) | Dallas | City or locality |
 | Organization (O) | GoodmanHP | Organization name |
 | Common Name (CN) | GoodmanHP Controller | FQDN of the server |
+| Email | (none) | Blank to omit from certificate |
 | CSR filename | CN.csr | Defaults to CN with spaces replaced by underscores |
 | Certificate filename | CN.pem | Enter "none" to skip self-signing (CSR only) |
 | Config filename | CN.conf | Defaults to CN with spaces replaced by underscores |
@@ -59,6 +60,7 @@ $ ./gen-cert.sh /mnt/sd/key.pem
   City (L) [Dallas]:
   Organization (O) [GoodmanHP]:
   Common Name / FQDN (CN) [GoodmanHP Controller]:
+  Email (blank to omit):
   CSR filename [GoodmanHP_Controller.csr]:
   Certificate filename ("none" to skip) [GoodmanHP_Controller.pem]:
   Config filename [GoodmanHP_Controller.conf]:

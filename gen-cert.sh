@@ -50,6 +50,8 @@ dn_o="${dn_o:-GoodmanHP}"
 read -rp "  Common Name / FQDN (CN) [GoodmanHP Controller]: " dn_cn
 dn_cn="${dn_cn:-GoodmanHP Controller}"
 
+read -rp "  Email (blank to omit): " dn_email
+
 # CSR filename — default to CN with spaces replaced by underscores
 csr_default="${dn_cn// /_}.csr"
 read -rp "  CSR filename [${csr_default}]: " csr_file
@@ -114,6 +116,10 @@ O  = ${dn_o}
 CN = ${dn_cn}
 CONF
 
+if [ -n "$dn_email" ]; then
+    echo "emailAddress = ${dn_email}" >> "$TMP_CONF"
+fi
+
 if [ "$cfg_prompt" = "yes" ]; then
     cat >> "$TMP_CONF" <<'CONF'
 challengePassword = A challenge password
@@ -162,7 +168,11 @@ else
 fi
 echo "Bits:     $cfg_bits"
 echo "Digest:   $cfg_md"
-echo "Subject:  C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o, CN=$dn_cn"
+if [ -n "$dn_email" ]; then
+    echo "Subject:  C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o, CN=$dn_cn, emailAddress=$dn_email"
+else
+    echo "Subject:  C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o, CN=$dn_cn"
+fi
 if [ -n "$cfg_ca" ]; then
     echo "CA:       $cfg_ca"
 else
