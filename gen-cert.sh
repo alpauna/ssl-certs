@@ -50,6 +50,11 @@ dn_o="${dn_o:-GoodmanHP}"
 read -rp "  Common Name / FQDN (CN) [GoodmanHP Controller]: " dn_cn
 dn_cn="${dn_cn:-GoodmanHP Controller}"
 
+# CSR filename — default to CN with spaces replaced by underscores
+csr_default="${dn_cn// /_}.csr"
+read -rp "  CSR filename [${csr_default}]: " csr_file
+csr_file="${csr_file:-$csr_default}"
+
 echo
 echo "=== Extensions ==="
 read -rp "  basicConstraints CA: (TRUE/FALSE, blank for none): " cfg_ca
@@ -127,7 +132,8 @@ fi
 echo
 echo "=== Summary ==="
 echo "Key:      $KEY_FILE"
-echo "Output:   $CERT_FILE"
+echo "CSR:      $csr_file"
+echo "Cert:     $CERT_FILE"
 if [ -n "$DAYS" ]; then
     echo "Valid:    $DAYS days"
 else
@@ -154,12 +160,23 @@ if [ -n "$DAYS" ]; then
     DAYS_ARG=(-days "$DAYS")
 fi
 
-openssl req -new -x509 \
+# Generate CSR
+openssl req -new \
     -key "$KEY_FILE" \
-    -out "$CERT_FILE" \
+    -out "$csr_file" \
+    -config "$TMP_CONF"
+
+echo
+echo "CSR generated: $csr_file"
+
+# Self-sign the CSR to produce the certificate
+openssl x509 -req \
+    -in "$csr_file" \
+    -signkey "$KEY_FILE" \
     "${DAYS_ARG[@]}" \
-    -config "$TMP_CONF" \
-    -extensions v3_req
+    -extfile "$TMP_CONF" \
+    -extensions v3_req \
+    -out "$CERT_FILE"
 
 echo
 echo "Certificate generated: $CERT_FILE"
