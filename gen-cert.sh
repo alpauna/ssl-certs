@@ -9,7 +9,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 KEY_FILE="${1:-key.pem}"
-CERT_FILE="${2:-cert.pem}"
+CERT_FILE_ARG="${2:-}"
 DAYS="${3:-}"
 
 if [ ! -f "$KEY_FILE" ]; then
@@ -54,6 +54,14 @@ dn_cn="${dn_cn:-GoodmanHP Controller}"
 csr_default="${dn_cn// /_}.csr"
 read -rp "  CSR filename [${csr_default}]: " csr_file
 csr_file="${csr_file:-$csr_default}"
+
+# Self-signed cert — default from CLI arg or CN-based, "none" to skip
+cert_default="${CERT_FILE_ARG:-${dn_cn// /_}.pem}"
+read -rp "  Certificate filename (\"none\" to skip) [${cert_default}]: " CERT_FILE
+CERT_FILE="${CERT_FILE:-$cert_default}"
+if [ "$CERT_FILE" = "none" ]; then
+    CERT_FILE=""
+fi
 
 echo
 echo "=== Extensions ==="
@@ -133,11 +141,15 @@ echo
 echo "=== Summary ==="
 echo "Key:      $KEY_FILE"
 echo "CSR:      $csr_file"
-echo "Cert:     $CERT_FILE"
-if [ -n "$DAYS" ]; then
-    echo "Valid:    $DAYS days"
+if [ -n "$CERT_FILE" ]; then
+    echo "Cert:     $CERT_FILE"
+    if [ -n "$DAYS" ]; then
+        echo "Valid:    $DAYS days"
+    else
+        echo "Valid:    (no expiry set)"
+    fi
 else
-    echo "Valid:    (no expiry set)"
+    echo "Cert:     (skipped)"
 fi
 echo "Bits:     $cfg_bits"
 echo "Digest:   $cfg_md"
@@ -155,11 +167,6 @@ if [ ${#ip_entries[@]} -gt 0 ]; then
 fi
 echo
 
-DAYS_ARG=()
-if [ -n "$DAYS" ]; then
-    DAYS_ARG=(-days "$DAYS")
-fi
-
 # Generate CSR
 openssl req -new \
     -key "$KEY_FILE" \
@@ -169,17 +176,24 @@ openssl req -new \
 echo
 echo "CSR generated: $csr_file"
 
-# Self-sign the CSR to produce the certificate
-openssl x509 -req \
-    -in "$csr_file" \
-    -signkey "$KEY_FILE" \
-    "${DAYS_ARG[@]}" \
-    -extfile "$TMP_CONF" \
-    -extensions v3_req \
-    -out "$CERT_FILE"
+# Self-sign the CSR if cert path was provided
+if [ -n "$CERT_FILE" ]; then
+    DAYS_ARG=()
+    if [ -n "$DAYS" ]; then
+        DAYS_ARG=(-days "$DAYS")
+    fi
 
-echo
-echo "Certificate generated: $CERT_FILE"
-echo
-openssl x509 -in "$CERT_FILE" -noout -subject -dates -ext subjectAltName 2>/dev/null || \
-openssl x509 -in "$CERT_FILE" -noout -subject -dates
+    openssl x509 -req \
+        -in "$csr_file" \
+        -signkey "$KEY_FILE" \
+        "${DAYS_ARG[@]}" \
+        -extfile "$TMP_CONF" \
+        -extensions v3_req \
+        -out "$CERT_FILE"
+
+    echo
+    echo "Certificate generated: $CERT_FILE"
+    echo
+    openssl x509 -in "$CERT_FILE" -noout -subject -dates -ext subjectAltName 2>/dev/null || \
+    openssl x509 -in "$CERT_FILE" -noout -subject -dates
+fi

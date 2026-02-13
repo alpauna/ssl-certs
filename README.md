@@ -1,6 +1,6 @@
 # ssl-certs
 
-Interactive OpenSSL cert generator — prompts for DN fields, key size, digest, basicConstraints, and DNS/IP SANs, then generates a CSR and self-signed certificate from an existing private key.
+Interactive OpenSSL cert generator — prompts for DN fields, key size, digest, basicConstraints, and DNS/IP SANs, then generates a CSR and optionally a self-signed certificate from an existing private key.
 
 ## Usage
 
@@ -8,7 +8,7 @@ Interactive OpenSSL cert generator — prompts for DN fields, key size, digest, 
 ./gen-cert.sh [key.pem] [cert.pem] [days]
 ```
 
-All arguments are optional. Defaults: `key.pem`, `cert.pem`. If `days` is omitted, no expiry is set on the certificate.
+All arguments are optional. Defaults: `key.pem`. If `cert.pem` is provided it becomes the default for the certificate prompt. If `days` is omitted, no expiry is set on the certificate.
 
 ### Prompts
 
@@ -23,20 +23,20 @@ All arguments are optional. Defaults: `key.pem`, `cert.pem`. If `days` is omitte
 | Organization (O) | GoodmanHP | Organization name |
 | Common Name (CN) | GoodmanHP Controller | FQDN of the server |
 | CSR filename | CN.csr | Defaults to CN with spaces replaced by underscores |
+| Certificate filename | CN.pem | Enter "none" to skip self-signing (CSR only) |
 | basicConstraints CA | (none) | TRUE, FALSE, or blank (omit entirely) |
 | DNS names | (none) | Enter one per line, blank to finish |
 | IP addresses | (none) | Enter one per line, blank to finish |
 
 ### Output
 
-The script produces two files:
-- **CSR** — Certificate Signing Request (submit to a CA, or used internally for self-signing)
-- **Certificate** — Self-signed cert generated from the CSR
+- **CSR** — Always generated. Submit to a CA or use for self-signing.
+- **Certificate** — Optional. Self-signed cert generated from the CSR. Enter "none" at the prompt to produce only the CSR.
 
 ### Example
 
 ```
-$ ./gen-cert.sh /mnt/sd/key.pem /mnt/sd/cert.pem
+$ ./gen-cert.sh /mnt/sd/key.pem
 
 === Certificate Settings ===
   Key size (default_bits) [2048]:
@@ -50,6 +50,7 @@ $ ./gen-cert.sh /mnt/sd/key.pem /mnt/sd/cert.pem
   Organization (O) [GoodmanHP]:
   Common Name / FQDN (CN) [GoodmanHP Controller]:
   CSR filename [GoodmanHP_Controller.csr]:
+  Certificate filename ("none" to skip) [GoodmanHP_Controller.pem]:
 
 === Extensions ===
   basicConstraints CA: (TRUE/FALSE, blank for none): FALSE
@@ -66,7 +67,7 @@ Enter IP addresses (blank line to finish):
 === Summary ===
 Key:      /mnt/sd/key.pem
 CSR:      GoodmanHP_Controller.csr
-Cert:     /mnt/sd/cert.pem
+Cert:     GoodmanHP_Controller.pem
 Valid:    (no expiry set)
 Bits:     2048
 Digest:   sha256
@@ -77,7 +78,7 @@ IP:       192.168.0.100 192.168.4.1
 
 CSR generated: GoodmanHP_Controller.csr
 
-Certificate generated: /mnt/sd/cert.pem
+Certificate generated: GoodmanHP_Controller.pem
 
 subject=C=US, ST=Texas, L=Dallas, O=GoodmanHP, CN=GoodmanHP Controller
 X509v3 Subject Alternative Name:
