@@ -63,6 +63,11 @@ if [ "$CERT_FILE" = "none" ]; then
     CERT_FILE=""
 fi
 
+# Config filename — default to CN with spaces replaced by underscores
+conf_default="${dn_cn// /_}.conf"
+read -rp "  Config filename [${conf_default}]: " CONF_FILE
+CONF_FILE="${CONF_FILE:-$conf_default}"
+
 echo
 echo "=== Extensions ==="
 read -rp "  basicConstraints CA: (TRUE/FALSE, blank for none): " cfg_ca
@@ -88,10 +93,6 @@ while true; do
     [ -z "$entry" ] && break
     ip_entries+=("$entry")
 done
-
-# --- Build config file ---
-conf_default="${dn_cn// /_}.conf"
-CONF_FILE="${conf_default}"
 
 # Temp config for openssl (cleaned up on exit)
 TMP_CONF=$(mktemp "${SCRIPT_DIR}/openssl.XXXXXX.cnf")

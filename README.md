@@ -24,6 +24,7 @@ All arguments are optional. Defaults: `key.pem`. If `cert.pem` is provided it be
 | Common Name (CN) | GoodmanHP Controller | FQDN of the server |
 | CSR filename | CN.csr | Defaults to CN with spaces replaced by underscores |
 | Certificate filename | CN.pem | Enter "none" to skip self-signing (CSR only) |
+| Config filename | CN.conf | Defaults to CN with spaces replaced by underscores |
 | basicConstraints CA | (none) | TRUE, FALSE, or blank (omit entirely) |
 | DNS names | (none) | Enter one per line, blank to finish |
 | IP addresses | (none) | Enter one per line, blank to finish |
@@ -60,6 +61,7 @@ $ ./gen-cert.sh /mnt/sd/key.pem
   Common Name / FQDN (CN) [GoodmanHP Controller]:
   CSR filename [GoodmanHP_Controller.csr]:
   Certificate filename ("none" to skip) [GoodmanHP_Controller.pem]:
+  Config filename [GoodmanHP_Controller.conf]:
 
 === Extensions ===
   basicConstraints CA: (TRUE/FALSE, blank for none): FALSE
