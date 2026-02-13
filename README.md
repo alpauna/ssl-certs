@@ -21,6 +21,7 @@ All arguments are optional. Defaults: `key.pem`. If `cert.pem` is provided it be
 | State (ST) | Texas | State or province |
 | City (L) | Dallas | City or locality |
 | Organization (O) | GoodmanHP | Organization name |
+| Organizational Unit (OU) | (none) | Blank to omit |
 | Common Name (CN) | GoodmanHP Controller | FQDN of the server |
 | Email | (none) | Blank to omit from certificate |
 | CSR filename | CN.csr | Defaults to CN with spaces replaced by underscores |
@@ -59,6 +60,7 @@ $ ./gen-cert.sh /mnt/sd/key.pem
   State (ST) [Texas]:
   City (L) [Dallas]:
   Organization (O) [GoodmanHP]:
+  Organizational Unit (OU) (blank to omit):
   Common Name / FQDN (CN) [GoodmanHP Controller]:
   Email (blank to omit):
   CSR filename [GoodmanHP_Controller.csr]:

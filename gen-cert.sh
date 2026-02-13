@@ -47,6 +47,8 @@ dn_l="${dn_l:-Dallas}"
 read -rp "  Organization (O) [GoodmanHP]: " dn_o
 dn_o="${dn_o:-GoodmanHP}"
 
+read -rp "  Organizational Unit (OU) (blank to omit): " dn_ou
+
 read -rp "  Common Name / FQDN (CN) [GoodmanHP Controller]: " dn_cn
 dn_cn="${dn_cn:-GoodmanHP Controller}"
 
@@ -116,6 +118,9 @@ O  = ${dn_o}
 CN = ${dn_cn}
 CONF
 
+if [ -n "$dn_ou" ]; then
+    echo "OU = ${dn_ou}" >> "$TMP_CONF"
+fi
 if [ -n "$dn_email" ]; then
     echo "emailAddress = ${dn_email}" >> "$TMP_CONF"
 fi
@@ -168,11 +173,11 @@ else
 fi
 echo "Bits:     $cfg_bits"
 echo "Digest:   $cfg_md"
-if [ -n "$dn_email" ]; then
-    echo "Subject:  C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o, CN=$dn_cn, emailAddress=$dn_email"
-else
-    echo "Subject:  C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o, CN=$dn_cn"
-fi
+subject="C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o"
+[ -n "$dn_ou" ] && subject="$subject, OU=$dn_ou"
+subject="$subject, CN=$dn_cn"
+[ -n "$dn_email" ] && subject="$subject, emailAddress=$dn_email"
+echo "Subject:  $subject"
 if [ -n "$cfg_ca" ]; then
     echo "CA:       $cfg_ca"
 else
