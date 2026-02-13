@@ -138,7 +138,7 @@ if [ -n "$cfg_ca" ]; then
     echo "basicConstraints     = CA:${cfg_ca}" >> "$TMP_CONF"
 fi
 echo "keyUsage             = digitalSignature, keyEncipherment" >> "$TMP_CONF"
-echo "extendedKeyUsage     = serverAuth" >> "$TMP_CONF"
+echo "extendedKeyUsage     = serverAuth, clientAuth" >> "$TMP_CONF"
 
 if [ ${#dns_entries[@]} -gt 0 ] || [ ${#ip_entries[@]} -gt 0 ]; then
     echo "subjectAltName       = @alt_names" >> "$TMP_CONF"
