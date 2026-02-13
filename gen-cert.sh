@@ -89,7 +89,11 @@ while true; do
     ip_entries+=("$entry")
 done
 
-# --- Build temporary config ---
+# --- Build config file ---
+conf_default="${dn_cn// /_}.conf"
+CONF_FILE="${conf_default}"
+
+# Temp config for openssl (cleaned up on exit)
 TMP_CONF=$(mktemp "${SCRIPT_DIR}/openssl.XXXXXX.cnf")
 trap 'rm -f "$TMP_CONF"' EXIT
 
@@ -136,10 +140,14 @@ if [ ${#dns_entries[@]} -gt 0 ] || [ ${#ip_entries[@]} -gt 0 ]; then
     done
 fi
 
+# Save permanent config file
+cp "$TMP_CONF" "$CONF_FILE"
+
 # --- Summary ---
 echo
 echo "=== Summary ==="
 echo "Key:      $KEY_FILE"
+echo "Config:   $CONF_FILE"
 echo "CSR:      $csr_file"
 if [ -n "$CERT_FILE" ]; then
     echo "Cert:     $CERT_FILE"
@@ -174,7 +182,11 @@ openssl req -new \
     -config "$TMP_CONF"
 
 echo
+echo "Config saved: $CONF_FILE"
 echo "CSR generated: $csr_file"
+echo
+echo "To regenerate the CSR from the saved config:"
+echo "  openssl req -out $csr_file -key $KEY_FILE -config $CONF_FILE -new"
 
 # Self-sign the CSR if cert path was provided
 if [ -n "$CERT_FILE" ]; then

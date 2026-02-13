@@ -30,8 +30,17 @@ All arguments are optional. Defaults: `key.pem`. If `cert.pem` is provided it be
 
 ### Output
 
+- **Config** — OpenSSL `.conf` file (CN.conf) saved for reuse with `openssl req` directly.
 - **CSR** — Always generated. Submit to a CA or use for self-signing.
 - **Certificate** — Optional. Self-signed cert generated from the CSR. Enter "none" at the prompt to produce only the CSR.
+
+### Reusing the config file
+
+The saved `.conf` can be passed directly to OpenSSL:
+
+```bash
+openssl req -out server.csr -key server.key -config GoodmanHP_Controller.conf -new
+```
 
 ### Example
 
@@ -66,6 +75,7 @@ Enter IP addresses (blank line to finish):
 
 === Summary ===
 Key:      /mnt/sd/key.pem
+Config:   GoodmanHP_Controller.conf
 CSR:      GoodmanHP_Controller.csr
 Cert:     GoodmanHP_Controller.pem
 Valid:    (no expiry set)
@@ -76,7 +86,11 @@ CA:       FALSE
 DNS:      goodmanhp.local
 IP:       192.168.0.100 192.168.4.1
 
+Config saved: GoodmanHP_Controller.conf
 CSR generated: GoodmanHP_Controller.csr
+
+To regenerate the CSR from the saved config:
+  openssl req -out GoodmanHP_Controller.csr -key /mnt/sd/key.pem -config GoodmanHP_Controller.conf -new
 
 Certificate generated: GoodmanHP_Controller.pem
 
