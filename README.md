@@ -1,6 +1,6 @@
 # ssl-certs
 
-Interactive OpenSSL cert generator for ESP32 HTTPS. Prompts for all certificate fields, extensions, and Subject Alternative Names, then generates a self-signed certificate from an existing private key.
+Interactive OpenSSL cert generator — prompts for DN fields, key size, digest, basicConstraints, and DNS/IP SANs, then signs with an existing private key.
 
 ## Usage
 
