@@ -1,6 +1,6 @@
 # ssl-certs
 
-Interactive OpenSSL cert generator — prompts for DN fields (including OU and email), key size, digest, basicConstraints, and DNS/IP SANs, then generates a reusable config, CSR, and optionally a self-signed certificate from an existing private key.
+Interactive OpenSSL cert generator — prompts for DN fields (including OU and email), key size, digest, basicConstraints, and DNS/IP SANs. Includes serverAuth + clientAuth extended key usage. Generates a reusable config, CSR, and optionally a self-signed certificate from an existing private key.
 
 ## Usage
 
