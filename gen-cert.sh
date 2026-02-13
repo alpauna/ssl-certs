@@ -10,7 +10,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 KEY_FILE="${1:-key.pem}"
 CERT_FILE="${2:-cert.pem}"
-DAYS="${3:-3650}"
+DAYS="${3:-}"
 
 if [ ! -f "$KEY_FILE" ]; then
     echo "Error: Private key not found: $KEY_FILE"
@@ -52,9 +52,10 @@ dn_cn="${dn_cn:-GoodmanHP Controller}"
 
 echo
 echo "=== Extensions ==="
-read -rp "  basicConstraints CA: (TRUE/FALSE/NA) [FALSE]: " cfg_ca
-cfg_ca="${cfg_ca:-FALSE}"
-cfg_ca=$(echo "$cfg_ca" | tr '[:lower:]' '[:upper:]')
+read -rp "  basicConstraints CA: (TRUE/FALSE, blank for none): " cfg_ca
+if [ -n "$cfg_ca" ]; then
+    cfg_ca=$(echo "$cfg_ca" | tr '[:lower:]' '[:upper:]')
+fi
 
 # --- SAN entries ---
 echo
@@ -104,7 +105,7 @@ fi
 
 echo "" >> "$TMP_CONF"
 echo "[v3_req]" >> "$TMP_CONF"
-if [ "$cfg_ca" != "NA" ]; then
+if [ -n "$cfg_ca" ]; then
     echo "basicConstraints     = CA:${cfg_ca}" >> "$TMP_CONF"
 fi
 echo "keyUsage             = digitalSignature, keyEncipherment" >> "$TMP_CONF"
@@ -127,11 +128,15 @@ echo
 echo "=== Summary ==="
 echo "Key:      $KEY_FILE"
 echo "Output:   $CERT_FILE"
-echo "Valid:    $DAYS days"
+if [ -n "$DAYS" ]; then
+    echo "Valid:    $DAYS days"
+else
+    echo "Valid:    (no expiry set)"
+fi
 echo "Bits:     $cfg_bits"
 echo "Digest:   $cfg_md"
 echo "Subject:  C=$dn_c, ST=$dn_st, L=$dn_l, O=$dn_o, CN=$dn_cn"
-if [ "$cfg_ca" != "NA" ]; then
+if [ -n "$cfg_ca" ]; then
     echo "CA:       $cfg_ca"
 else
     echo "CA:       (omitted)"
@@ -144,10 +149,15 @@ if [ ${#ip_entries[@]} -gt 0 ]; then
 fi
 echo
 
+DAYS_ARG=()
+if [ -n "$DAYS" ]; then
+    DAYS_ARG=(-days "$DAYS")
+fi
+
 openssl req -new -x509 \
     -key "$KEY_FILE" \
     -out "$CERT_FILE" \
-    -days "$DAYS" \
+    "${DAYS_ARG[@]}" \
     -config "$TMP_CONF" \
     -extensions v3_req
 

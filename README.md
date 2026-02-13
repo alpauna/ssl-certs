@@ -8,7 +8,7 @@ Interactive OpenSSL cert generator — prompts for DN fields, key size, digest, 
 ./gen-cert.sh [key.pem] [cert.pem] [days]
 ```
 
-All arguments are optional and default to `key.pem`, `cert.pem`, and `3650` (10 years).
+All arguments are optional. Defaults: `key.pem`, `cert.pem`. If `days` is omitted, no expiry (`-days`) is added to the CSR request.
 
 ### Prompts
 
@@ -22,7 +22,7 @@ All arguments are optional and default to `key.pem`, `cert.pem`, and `3650` (10 
 | City (L) | Dallas | City or locality |
 | Organization (O) | GoodmanHP | Organization name |
 | Common Name (CN) | GoodmanHP Controller | FQDN of the server |
-| basicConstraints CA | FALSE | TRUE, FALSE, or NA (omit entirely) |
+| basicConstraints CA | (none) | TRUE, FALSE, or blank (omit entirely) |
 | DNS names | (none) | Enter one per line, blank to finish |
 | IP addresses | (none) | Enter one per line, blank to finish |
 
@@ -44,7 +44,7 @@ $ ./gen-cert.sh /mnt/sd/key.pem /mnt/sd/cert.pem
   Common Name / FQDN (CN) [GoodmanHP Controller]:
 
 === Extensions ===
-  basicConstraints CA: (TRUE/FALSE/NA) [FALSE]:
+  basicConstraints CA: (TRUE/FALSE, blank for none): FALSE
 
 === Subject Alternative Names ===
 Enter DNS names (blank line to finish):
@@ -58,7 +58,7 @@ Enter IP addresses (blank line to finish):
 === Summary ===
 Key:      /mnt/sd/key.pem
 Output:   /mnt/sd/cert.pem
-Valid:    3650 days
+Valid:    (no expiry set)
 Bits:     2048
 Digest:   sha256
 Subject:  C=US, ST=Texas, L=Dallas, O=GoodmanHP, CN=GoodmanHP Controller
@@ -69,8 +69,6 @@ IP:       192.168.0.100 192.168.4.1
 Certificate generated: /mnt/sd/cert.pem
 
 subject=C=US, ST=Texas, L=Dallas, O=GoodmanHP, CN=GoodmanHP Controller
-notBefore=Feb 13 12:00:00 2026 GMT
-notAfter=Feb 11 12:00:00 2036 GMT
 X509v3 Subject Alternative Name:
     DNS:goodmanhp.local, IP Address:192.168.0.100, IP Address:192.168.4.1
 ```
